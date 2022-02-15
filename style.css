@@ -1,0 +1,12 @@
+section{
+    max-width: 1000px;
+    display: flex;
+    justify-content: space-around;
+}
+
+#color{
+    width:200px;
+    height:200px;
+    background-color: black;
+    border: 1px solid black;
+}
