@@ -1,17 +1,16 @@
-let input;
 document.addEventListener("input", start);
 
 function start() {
-    getColorInput();
+    console.log("start");
 
-
-    converter();
+    getColors();
 
 }
 
 
-function getColorInput() {
-
+function getUserInput() {
+    console.log("getinput works");
+    let input;
     input = document.getElementById("color_input").value;
     input.toString();
     return input;
@@ -33,8 +32,8 @@ function toRGB(color) {
     const B = parseInt(bhex, 16);
 
 
-    //adds all converted colors to correct format
-    const RGB = R + "," + G + "," + B;
+    //adds all converted colors to object
+    const RGB = { R, G, B };
 
     return RGB;
 }
@@ -42,85 +41,124 @@ function toRGB(color) {
 
 
 function toHSL(r, g, b) {
-   
-   
+    console.log("toHSl works");
+
+
     r /= 255;
     g /= 255;
     b /= 255;
 
-    let h, s, l;
+    let H, S, L;
 
     const min = Math.min(r, g, b);
     const max = Math.max(r, g, b);
 
     if (max === min) {
-        h = 0;
+        H = 0;
     } else
         if (max === r) {
-            h = 60 * (0 + (g - b) / (max - min));
+            H = 60 * (0 + (g - b) / (max - min));
         } else
             if (max === g) {
-                h = 60 * (2 + (b - r) / (max - min));
+                H = 60 * (2 + (b - r) / (max - min));
             } else
                 if (max === b) {
-                    h = 60 * (4 + (r - g) / (max - min));
+                    H = 60 * (4 + (r - g) / (max - min));
                 }
 
-    if (h < 0) { h = h + 360; }
+    if (H < 0) { H = H + 360; }
 
-    l = (min + max) / 2;
+    L = (min + max) / 2;
 
     if (max === 0 || min === 1) {
-        s = 0;
+        S = 0;
     } else {
-        s = (max - l) / (Math.min(l, 1 - l));
+        S = (max - L) / (Math.min(L, 1 - L));
     }
-    // multiply s and l by 100 to get the value in percent, rather than [0,1]
-    s *= 100;
-    l *= 100;
+    // multiply S and L by 100 to get the value in percent, rather than [0,1]
+    S *= 100;
+    L *= 100;
 
-    console.log("hsl(%f,%f%,%f%)", h, s, l); // just for testing
-    const HSL = `${Math.floor(h)}, ${Math.floor(s)}%, ${Math.floor(l)}%`;
+    //rounds the values
+    H = Math.floor(H);
+    S = Math.floor(S);
+    L = Math.floor(L);
+
+    const HSL = { H, S, L };
     return HSL;
 
 }
 
-function converter() {
+function rgbToCss(r, g, b){
+const cssColor = `rgb(${r},${g},${b})`;
+return cssColor;
+}
 
-    const hex = getColorInput();
+//this functions calls  and converts the returned colors from each toXXX function
+function getColors() {
+    console.log("getColors works");
+
+    //gets the returned values from each functions using the user input, and previously converted
+    const hex = getUserInput();
     const rgb = toRGB(hex);
-
-    const firstComma = rgb.indexOf(",");
-    const secondComma = rgb.indexOf(",", firstComma + 1);
-    const lastComma = rgb.lastIndexOf(",");
-    r = rgb.substring(0, firstComma).trim();
-    g = rgb.substring(firstComma + 1, secondComma).trim();
-    b = rgb.substring(lastComma + 1).trim();
-
-    const hsl = toHSL(r, g, b);
+    const hsl = toHSL(rgb.R, rgb.G, rgb.B);
+    const cssColor = rgbToCss(rgb.R, rgb.G, rgb.B);
 
 
 
+    delegator(rgb, hsl, hex,cssColor);
+}
 
-    displayColor(rgb, hsl, hex);
+function delegator(rgb, hsl, hex, css) {
+    console.log("delegator works");
+
+    showRGB(rgb);
+    showHSL(hsl);
+    showHex(hex);
+    showColor(hex);
+    showCssColor(css);
 }
 
 
-function displayColor(rgb, hsl, hex) {
+
+function showRGB(rgb) {
+    
+
+    //make the object into string, before showing it in the selected destination
+    const RGB = `${rgb.R}, ${rgb.G}, ${rgb.B}`;
+
     const rgbDestination = document.querySelector(".rgb");
+    rgbDestination.innerHTML = RGB;
+
+
+}
+
+function showHSL(hsl) {
+    //make the object into string, before showing it in the selected destination
+    const HSL = `${hsl.H}, ${hsl.S}%, ${hsl.L}%`;
+
     const hslDestination = document.querySelector(".hsl");
+    hslDestination.innerHTML = HSL;
+
+
+}
+
+function showHex(hex) {
+    const HEX = hex.toUpperCase();
     const hexDestination = document.querySelector(".hex");
+    hexDestination.innerHTML = HEX;
+
+
+}
+
+
+function showColor(color) {
     const colorDest = document.querySelector("#color");
+    colorDest.style.backgroundColor = color;
+
+}
 
 
-
-    rgbDestination.innerHTML = rgb;
-    hslDestination.innerHTML = hsl;
-    hexDestination.innerHTML = hex;
-    colorDest.style.backgroundColor = hex;
-
-    console.log(rgb)
-    console.log(hsl)
-    console.log(hex)
-
+function showCssColor(cssColor) {
+  console.log(cssColor);
 }
